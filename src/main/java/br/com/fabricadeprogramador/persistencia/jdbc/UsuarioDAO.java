@@ -2,7 +2,11 @@ package br.com.fabricadeprogramador.persistencia.jdbc;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.com.fabricadeprogramador.model.Usuario;
 
@@ -42,7 +46,7 @@ public class UsuarioDAO {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void excluir(Usuario usuario) {
 		String sql = "delete from usuario where id = ?";
 		try {
@@ -54,4 +58,49 @@ public class UsuarioDAO {
 			e.printStackTrace();
 		}
 	}
+
+	public Usuario buscarUsuarioID(int id) {
+		Usuario usuario = null;
+		String sql = "select * from usuario where id = ?";
+		try {
+			PreparedStatement buscar = connection.prepareStatement(sql);
+			buscar.setInt(1, id);
+			ResultSet resultado = buscar.executeQuery();
+			if (resultado.next()) {
+				usuario = new Usuario();
+				usuario.setId(id);
+				usuario.setNome(resultado.getString("nome"));
+				usuario.setLogin(resultado.getString("login"));
+				usuario.setSenha(resultado.getString("senha"));
+			}
+			buscar.close();
+			resultado.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return usuario;
+	}
+
+	public List<Usuario> listar() {
+		List<Usuario> usuarios = new ArrayList<Usuario>();
+		String sql = "select * from usuario";
+		try {
+			Statement busca = connection.createStatement();
+			ResultSet resultado = busca.executeQuery(sql);
+			while (resultado.next()) {
+				Usuario usuario = new Usuario();
+				usuario.setId(resultado.getInt("id"));
+				usuario.setNome(resultado.getString("nome"));
+				usuario.setLogin(resultado.getString("login"));
+				usuario.setSenha(resultado.getString("senha"));
+				usuarios.add(usuario);
+			}
+			busca.close();
+			resultado.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return usuarios;
+	}
+
 }
