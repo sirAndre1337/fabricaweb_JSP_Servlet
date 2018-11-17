@@ -52,4 +52,13 @@ public class TestUsuarioDAO {
 			System.out.println(usuario);
 		}
 	}
+	
+	@Test
+	public void testAutenticarUsuario() {
+		UsuarioDAO ud = new UsuarioDAO();
+		Usuario usuario = new Usuario();
+		usuario.setLogin("adrzika");
+		usuario.setSenha("123");
+		System.out.println(ud.autenticar(usuario));
+	}
 }

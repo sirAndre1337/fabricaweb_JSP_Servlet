@@ -19,7 +19,7 @@ public class UsuarioDAO {
 	}
 
 	public void salvar(Usuario usuario) {
-		String sql = "insert into usuario (nome,login,senha) values (?,?,?)";
+		String sql = "insert into usuario (nome,login,senha) values (?,?,md5(?))";
 		try {
 			PreparedStatement salvar = connection.prepareStatement(sql);
 			salvar.setString(1, usuario.getNome());
@@ -33,7 +33,7 @@ public class UsuarioDAO {
 	}
 
 	public void atualizar(Usuario usuario) {
-		String sql = "update usuario set nome = ?,login = ?,senha=? where id = ?";
+		String sql = "update usuario set nome = ?,login = ?,senha=md5(?) where id = ?";
 		try {
 			PreparedStatement atualizar = connection.prepareStatement(sql);
 			atualizar.setString(1, usuario.getNome());
@@ -102,5 +102,29 @@ public class UsuarioDAO {
 		}
 		return usuarios;
 	}
-
+	
+	// Verificar se existe no BD um usuario. Passando só o Login e senha!.
+	public Usuario autenticar(Usuario usuario) {
+		Usuario usuRetornado = null;
+		String sql = "select * from usuario where login = ? and senha = md5(?)";
+		try {
+			PreparedStatement buscar = connection.prepareStatement(sql);
+			buscar.setString(1, usuario.getLogin());
+			buscar.setString(2, usuario.getSenha());
+			ResultSet resultado = buscar.executeQuery();
+			if(resultado.next()) {
+				usuRetornado = new Usuario();
+				usuRetornado.setId(resultado.getInt("id"));
+				usuRetornado.setNome(resultado.getString("nome"));
+				usuRetornado.setLogin(resultado.getString("login"));
+				usuRetornado.setSenha(resultado.getString("senha"));
+			}
+			buscar.close();
+			resultado.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		if(usuRetornado == null) System.out.println("Usuario não encontrado.");
+		return usuRetornado;
+	}
 }

@@ -13,6 +13,11 @@ public class ConexaoFactory {
 	public static Connection Conexao() {
 		try {
 			if (connection == null)
+				try {
+					Class.forName("org.postgresql.Driver");
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
 				connection = DriverManager.getConnection(URL, USER, PASSWORD);
 		} catch (SQLException e) {
 			// Relançando a Exception
